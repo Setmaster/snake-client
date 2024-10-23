@@ -1,4 +1,5 @@
 ﻿let connection;
+let lastDirection = null;
 
 const handleUserInput = function (key) {
     if (key === "\u0003") {
@@ -7,20 +8,23 @@ const handleUserInput = function (key) {
 
     switch (key) {
         case "w":
-            connection.write("Move: up");
+            lastDirection = "Move: up";
             break;
         case "a":
-            connection.write("Move: left");
+            lastDirection = "Move: left";
             break;
         case "s":
-            connection.write("Move: down");
+            lastDirection = "Move: down";
             break;
         case "d":
-            connection.write("Move: right");
+            lastDirection = "Move: right";
             break;
         case "e":
             connection.write("Say: Hungry!");
             break;
+    }
+    if (lastDirection) {
+        connection.write(lastDirection);
     }
 };
 
@@ -31,6 +35,13 @@ const setupInput = function (conn) {
     stdin.setEncoding("utf8"); // utf8 encoding is set so that we can read the text data that is input
     stdin.resume(); // resume stdin so the program can listen for input
     stdin.on("data", handleUserInput);
+    
+    setInterval(() => {
+        if (lastDirection) {
+            connection.write(lastDirection);
+        }
+    }, 100);
+    
     return stdin;   // return the stdin object so we can use it elsewhere in the program
 };
 
